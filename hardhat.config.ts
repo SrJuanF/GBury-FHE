@@ -19,10 +19,10 @@ const ETHERSCAN_API_KEY: string = vars.get("ETHERSCAN_API_KEY");
 
 const MNEMONIC: string = vars.get("MNEMONIC");
 // Obtener las claves privadas directamente de las variables de entorno
-const PRIVATE_KEY_1: string = vars.get("PRIVATE_KEY_1"); // MetaMask Cuenta 1
-const PRIVATE_KEY_2: string = vars.get("PRIVATE_KEY_2"); // MetaMask Cuenta 2
-const PRIVATE_KEY_5: string = vars.get("PRIVATE_KEY_5"); // MetaMask Cuenta 5
-const PRIVATE_KEY_6: string = vars.get("PRIVATE_KEY_6"); // MetaMask Cuenta 4
+const PRIVATE_KEY_1: string = vars.get("PRIVATE_KEY_1"); 
+const PRIVATE_KEY_2: string = vars.get("PRIVATE_KEY_2"); 
+const PRIVATE_KEY_5: string = vars.get("PRIVATE_KEY_5"); 
+const PRIVATE_KEY_6: string = vars.get("PRIVATE_KEY_6"); 
 
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
