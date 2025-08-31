@@ -8,55 +8,70 @@ import "hardhat-gas-reporter";
 import type { HardhatUserConfig } from "hardhat/config";
 import { vars } from "hardhat/config";
 import "solidity-coverage";
-
+import { ethers } from "ethers";
 import "./tasks/accounts";
-import "./tasks/FHECounter";
+import "./tasks/Enterprises";
 
 // Run 'npx hardhat vars setup' to see the list of variables that need to be set
 
-const MNEMONIC: string = vars.get("MNEMONIC", "test test test test test test test test test test test junk");
-const INFURA_API_KEY: string = vars.get("INFURA_API_KEY", "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz");
+const SEPOLIA_RPC_URL: string = vars.get("SEPOLIA_RPC_URL");
+const ETHERSCAN_API_KEY: string = vars.get("ETHERSCAN_API_KEY");
+
+const MNEMONIC: string = vars.get("MNEMONIC");
+// Obtener las claves privadas directamente de las variables de entorno
+const PRIVATE_KEY_1: string = vars.get("PRIVATE_KEY_1"); // MetaMask Cuenta 1
+const PRIVATE_KEY_2: string = vars.get("PRIVATE_KEY_2"); // MetaMask Cuenta 2
+const PRIVATE_KEY_5: string = vars.get("PRIVATE_KEY_5"); // MetaMask Cuenta 5
+const PRIVATE_KEY_6: string = vars.get("PRIVATE_KEY_6"); // MetaMask Cuenta 4
 
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
+  networks: {
+    hardhat: {
+      accounts: {
+        mnemonic: MNEMONIC,
+        path: "m/44'/60'/0'/0/",
+        count: 10,
+      },
+      chainId: 31337,
+    },
+    localhost: {
+      url: "http://localhost:8545",
+      chainId: 31337,
+      accounts: [PRIVATE_KEY_1, PRIVATE_KEY_2, PRIVATE_KEY_5, PRIVATE_KEY_6],
+    },
+    anvil: {
+      url: "http://localhost:8545",
+      chainId: 31337,
+      accounts: [PRIVATE_KEY_1, PRIVATE_KEY_2, PRIVATE_KEY_5, PRIVATE_KEY_6],
+    },
+    sepolia: {
+      url: SEPOLIA_RPC_URL,
+      chainId: 11155111,
+      accounts: [PRIVATE_KEY_1, PRIVATE_KEY_2, PRIVATE_KEY_5, PRIVATE_KEY_6],
+      verify: {
+        etherscan: {
+          apiKey: ETHERSCAN_API_KEY,
+        },
+      },
+    },
+  },
   namedAccounts: {
     deployer: 0,
+    employer: 0, // wallet1
+    customer: 1, // wallet2
+    user: 2, // wallet3
+    emptSigner:3, // wallet4
   },
   etherscan: {
     apiKey: {
-      sepolia: vars.get("ETHERSCAN_API_KEY", ""),
+      sepolia: ETHERSCAN_API_KEY,
     },
   },
   gasReporter: {
     currency: "USD",
     enabled: process.env.REPORT_GAS ? true : false,
     excludeContracts: [],
-  },
-  networks: {
-    hardhat: {
-      accounts: {
-        mnemonic: MNEMONIC,
-      },
-      chainId: 31337,
-    },
-    anvil: {
-      accounts: {
-        mnemonic: MNEMONIC,
-        path: "m/44'/60'/0'/0/",
-        count: 10,
-      },
-      chainId: 31337,
-      url: "http://localhost:8545",
-    },
-    sepolia: {
-      accounts: {
-        mnemonic: MNEMONIC,
-        path: "m/44'/60'/0'/0/",
-        count: 10,
-      },
-      chainId: 11155111,
-      url: `https://sepolia.infura.io/v3/${INFURA_API_KEY}`,
-    },
   },
   paths: {
     artifacts: "./artifacts",
@@ -65,25 +80,35 @@ const config: HardhatUserConfig = {
     tests: "./test",
   },
   solidity: {
-    version: "0.8.24",
-    settings: {
-      metadata: {
-        // Not including the metadata hash
-        // https://github.com/paulrberg/hardhat-template/issues/31
-        bytecodeHash: "none",
+    compilers: [
+      {
+        version: "0.8.24",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 50,
+          },
+          viaIR: true,
+        },
       },
-      // Disable the optimizer when debugging
-      // https://hardhat.org/hardhat-network/#solidity-optimizer-support
-      optimizer: {
-        enabled: true,
-        runs: 800,
+      {
+        version: "0.8.20",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 50,
+          },
+          viaIR: true,
+        },
       },
-      evmVersion: "cancun",
-    },
+    ],
   },
   typechain: {
-    outDir: "types",
+    outDir: "typechain-types",
     target: "ethers-v6",
+  },
+  mocha: {
+    timeout: 200000,
   },
 };
 
